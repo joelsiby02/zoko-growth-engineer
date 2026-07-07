@@ -183,7 +183,7 @@ This would help merchants validate their AI immediately instead of having to thi
 
 ![AI Testing 1](images/imp4.1.png)
 
-![AI Testing 2](images/img4-2.png)
+![AI Testing 2](images/img4.2.png)
 
 ---
 
