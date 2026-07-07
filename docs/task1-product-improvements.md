@@ -53,7 +53,7 @@ Include quick action buttons that allow users to jump directly to the relevant s
 
 ## Screenshot
 
-`images/imp1.png`
+![Operational Summary](images/imp1.png)
 
 ---
 
@@ -91,7 +91,7 @@ Display both the percentage change and the absolute difference alongside importa
 
 ## Screenshot
 
-`images/imp2.png`
+![Period Comparison](images/imp2.png)
 
 ---
 
@@ -129,7 +129,7 @@ This would make commonly used features easier to access while keeping the existi
 
 ## Screenshot
 
-`images/imp3.png`
+![Personalized Workspace](images/imp3.png)
 
 ---
 
@@ -181,9 +181,9 @@ This would help merchants validate their AI immediately instead of having to thi
 
 ## Screenshots
 
-`images/imp4.1.png`
+![AI Testing 1](images/imp4.1.png)
 
-`images/imp4.2.png`
+![AI Testing 2](images/img4-2.png)
 
 ---
 
@@ -215,7 +215,7 @@ This would improve navigation for power users while keeping the current behaviou
 
 ## Screenshot
 
-`images/imp5.png`
+![Sidebar Navigation](images/imp5.png)
 
 ---
 
