@@ -1,0 +1,21 @@
+backend/
+│
+├── cmd/
+│   └── server/
+│       └── main.go
+│
+├── internal/
+│   ├── config/
+│   ├── handlers/
+│   ├── services/
+│   └── models/
+│
+├── go.mod
+└── .env
+
+Why?
+
+handlers → HTTP endpoints
+services → business logic
+models → request/response structures
+config → environment loading
