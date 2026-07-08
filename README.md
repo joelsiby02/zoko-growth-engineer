@@ -1,273 +1,257 @@
 # 💬 Zoko Live Messaging Monitor
 
-A lightweight real-time WhatsApp monitoring dashboard built using **Node.js (Express)** and **Streamlit**, integrated with the **Zoko API**.
+A lightweight real-time WhatsApp monitoring dashboard built using
+**Node.js (Express)** and **Streamlit**, integrated with the **Zoko
+API** and **Supabase**.
 
-This application listens to Zoko webhook events, tracks today's conversations, calculates first response SLA, and allows users to send WhatsApp messages directly through the dashboard.
+The application listens to Zoko webhook events, stores them in Supabase,
+calculates today's messaging metrics in real time, and allows users to
+send WhatsApp messages directly through the dashboard.
 
----
+## 🌐 Live Demo
 
-# 📸 Application Preview
+**Streamlit Dashboard**
+
+https://zokotest.streamlit.app
+
+## 📸 Application Preview
 
 ![Zoko Live Messaging Monitor](ui.png)
 
----
+## ✨ Features
 
-# ✨ Features
+### 📥 Real-Time Webhook Integration
 
-## 📥 Webhook Integration
+-   Receives **Incoming WhatsApp Messages** (`message:user:in`)
+-   Receives **Outgoing WhatsApp Messages** (`message:store:out`)
+-   Stores every webhook event in **Supabase**
+-   Processes events in real time
 
-- Receives incoming WhatsApp messages from Zoko
-- Receives outgoing WhatsApp messages from Zoko
-- Processes webhook events in real time
-- Stores messages in memory for this prototype
+### 📊 Live Dashboard
 
----
+Displays today's messaging metrics:
 
-## 📊 Live Dashboard
+-   👥 Unique Members Who Chatted
+-   👨‍💼 Unique Human & AI Agents Who Chatted
+-   🟢 Conversations receiving a first response within 1 minute
+-   🔴 Conversations receiving a first response after 1 minute
 
-Displays today's messaging metrics including:
-
-- 👥 Unique Members Who Chatted
-- 👨‍💼 Unique Agents Who Chatted
-- 🟢 Conversations receiving a first response within 1 minute
-- 🔴 Conversations receiving a first response after 1 minute
-
-The dashboard automatically refreshes every **5 seconds**.
-
----
+The dashboard refreshes automatically every **5 seconds**.
 
 ## 💬 Conversation Monitor
 
-Displays today's conversations with:
+Displays today's conversations including:
 
-- Customer Name
-- Phone Number
-- Agent Name
-- Agent Email (if available)
-- Application Name
-- Application Type
-- Customer Message
-- Agent Reply
-- Response Time
-- SLA Status Badge
+-   Customer Name
+-   Phone Number
+-   Agent Name
+-   Agent Email
+-   AI Agent Name (Guru, WISMO, Hallo, etc.)
+-   Customer Message
+-   Agent Reply
+-   Response Time
+-   SLA Status
 
-Conversations can also be downloaded as a CSV file.
+### 📨 Send WhatsApp Message
 
----
+-   Mobile number validation
+-   Automatic Indian country code (`91`) prefix
+-   Delivery status
+-   Customer ID
+-   Message ID
 
-## 📨 Send WhatsApp Message
+## 🧠 First Response SLA Logic
 
-A simple form allows sending WhatsApp messages through the Zoko API.
+For **each customer per day**:
 
-Features include:
-
-- Mobile number validation
-- Automatic country code prefix (`91`)
-- Delivery status display
-- Customer ID
-- Message ID
-
----
-
-# 🧠 First Response Logic
-
-After clarifying the requirement, the application calculates SLA as follows:
-
-- Only the **first customer conversation of the day** is considered.
-- The **first agent reply** determines the response time.
-- Any later conversations from the **same customer on the same day are ignored** for SLA calculation.
-- Metrics automatically reset each day by considering only today's webhook events.
+-   Only the first incoming customer message is considered.
+-   Only the first agent reply is used for SLA calculation.
+-   Any subsequent conversations from the same customer on the same day
+    are ignored.
+-   Metrics automatically reset each day by calculating only today's
+    webhook events.
 
 ### Example
 
-```
+``` text
 09:00 Customer → Hi
 09:00:20 Agent → Hello
-✅ Counted (20 seconds)
+
+✅ Counted
 
 14:00 Customer → Need help
 14:04 Agent → Sure
+
 ❌ Ignored
 ```
 
-Dashboard Result
+Dashboard:
 
-```
+``` text
 🟢 Under 1 Minute = 1
 🔴 Over 1 Minute = 0
 ```
 
----
+## 🏗️ Architecture
 
-# 🏗️ Tech Stack
-
-### Backend
-
-- Node.js
-- Express.js
-- Axios
-
-### Frontend
-
-- Streamlit
-- Pandas
-
-### APIs
-
-- Zoko Webhook API
-- Zoko Messaging API
-
----
-
-# 📁 Project Structure
-
+``` text
+WhatsApp Customer
+        │
+        ▼
+     Zoko API
+        │
+        ▼
+Webhook Events
+        │
+        ▼
+Express Backend
+        │
+ ┌──────┴─────────┐
+ │                │
+ ▼                ▼
+Supabase      Zoko Message API
+ │                │
+ ▼                ▼
+Dashboard     Send Message
+        │
+        ▼
+ Streamlit UI
 ```
+
+------------------------------------------------------------------------
+
+# 📊 Dashboard Logic
+
+Every dashboard refresh performs the following:
+
+1.  Fetches webhook events from Supabase.
+2.  Filters only today's events.
+3.  Calculates:
+    -   Unique Members
+    -   Unique Agents
+    -   First Responses Under 1 Minute
+    -   First Responses Over 1 Minute
+4.  Returns live metrics to the dashboard.
+
+No dashboard values are hardcoded.
+
+------------------------------------------------------------------------
+
+
+## 🛠️ Tech Stack
+
+-   Node.js
+-   Express.js
+-   Streamlit
+-   Supabase (PostgreSQL)
+-   Axios
+-   Pandas
+-   Zoko Webhook API
+-   Zoko Message API
+
+
+## 📁 Project Structure
+
+``` text
 backend/
-│
 ├── controllers/
 ├── routes/
 ├── services/
+│   ├── messageService.js
+│   ├── statsService.js
+│   ├── supabase.js
+│   └── zokoService.js
 ├── app.js
 ├── server.js
-├── package.json
-└── package-lock.json
+└── package.json
 
 frontend/
-│
 ├── app.py
 └── requirements.txt
 ```
 
----
+## ⚙️ Environment Variables
 
-# ⚙️ Environment Variables
-
-Create a `.env` file inside the backend folder.
-
-```env
+``` env
 PORT=5000
 ZOKO_API_KEY=YOUR_ZOKO_API_KEY
+SUPABASE_URL=YOUR_SUPABASE_PROJECT_URL
+SUPABASE_SERVICE_ROLE_KEY=YOUR_SUPABASE_SERVICE_ROLE_KEY
 ```
 
----
-
-# 🚀 Running Locally
-
-## Backend
-
-```bash
-git clone <repository-url>
-
-cd backend
-
-npm install
-
-npm run dev
-```
-
-Backend runs on
-
-```
-http://localhost:5000
-```
-
----
-
-## Frontend
-
-```bash
-cd frontend
-
-pip install -r requirements.txt
-
-streamlit run app.py
-```
-
-Frontend runs on
-
-```
-http://localhost:8501
-```
-
----
-
-# 🔌 API Endpoints
-
-## Receive Webhook
-
-```
-POST /webhook
-```
-
-Receives incoming and outgoing WhatsApp webhook events.
-
----
-
-## Dashboard
-
-```
-GET /dashboard
-```
-
-Returns:
-
-- Today's Summary Metrics
-- Active Agents
-- Today's Conversations
-
----
-
-## Messages
-
-```
-GET /messages
-```
-
-Returns all received webhook events.
-
----
-
-## Send WhatsApp Message
-
-```
-POST /send-message
-```
-
-Example Request
-
-```json
-{
-    "phone": "919876543210",
-    "message": "Hello from Zoko Monitor"
-}
-```
-
----
-
-# 🌐 Deployment
+## 🚀 Running Locally
 
 ### Backend
 
-Deploy using:
+``` bash
+cd backend
+npm install
+npm run dev
+```
 
-- Render
-- Railway
+Runs on `http://localhost:5000`
 
 ### Frontend
 
-Deploy using:
-
-- Streamlit Community Cloud
-
-After deployment, update:
-
-```python
-BACKEND_URL = "https://your-backend-url.com"
+``` bash
+cd frontend
+pip install -r requirements.txt
+streamlit run app.py
 ```
 
----
+Runs on `http://localhost:8501`
 
-# 📌 Notes
+## 🔌 API Endpoints
 
-- This project was developed as a working prototype for the **Zoko Growth Engineer Task**.
-- Still updation needed, since time was a limitation. Will be revisiting this project back
+-   `POST /webhook`
+-   `GET /dashboard`
+-   `GET /messages`
+-   `POST /send-message`
+
+## Webhook Testing
+
+During local development, **ngrok** was used to expose the local backend
+to the internet.
+
+``` bash
+ngrok http 5000
+```
+
+This generated a public HTTPS URL which was configured in the **Zoko
+Test Product** webhook settings.
+
+Example:
+
+    https://xxxxx.ngrok-free.app/webhook
+
+Once configured, every incoming and outgoing WhatsApp message was
+delivered to the local backend through the webhook.
+
+------------------------------------------------------------------------
+
+## 🌍 Deployment
+
+-   Backend: Railway
+-   Frontend: Streamlit Community Cloud
+
+Live App:
+
+https://zokotest.streamlit.app
+
+## 📌 Assumptions
+
+-   Metrics are calculated only from today's webhook events.
+-   Each customer contributes only one SLA measurement per day.
+-   Both human agents and AI agents are counted.
+-   Webhook events are persisted in Supabase.
+
+## 📌 Future Improvements
+
+-   Authentication
+-   Historical analytics
+-   Date filters
+-   Search
+-   WebSockets
+-   Charts
+-   Docker
+-   Unit tests
