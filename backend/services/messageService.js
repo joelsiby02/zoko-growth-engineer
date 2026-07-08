@@ -1,36 +1,67 @@
-const messages = [];
+const supabase = require("./supabase");
 
-const saveMessage = (payload) => {
+const saveMessage = async (payload) => {
 
     const message = {
 
-        event: payload.event,
-        direction: payload.direction,
+        message_id: payload.id || null,
 
-        customerId: payload.customer?.id || null,
-        customerName: payload.customerName || "",
+        customer_id: payload.customer?.id || null,
+
+        customer_name: payload.customerName || "",
 
         phone: payload.platformSenderId || "",
 
+        direction: payload.direction || "",
+
+        event: payload.event || "",
+
         text: payload.text || "",
 
-        senderName: payload.senderName || "",
+        timestamp: payload.platformTimestamp || new Date().toISOString(),
 
-        agentEmail: payload.agentEmail || null,
+        delivery_status: payload.deliveryStatus || null,
 
-        appName: payload.appName || null,
+        agent_email: payload.agentEmail || null,
 
-        appType: payload.appType || null,
+        app_name: payload.appName || null,
 
-        timestamp: payload.platformTimestamp || new Date().toISOString()
+        app_type: payload.appType || null,
+
+        sender_name: payload.senderName || "",
+
+        payload: payload
 
     };
 
-    messages.push(message);
+    const { error } = await supabase
+        .from("messages")
+        .insert(message);
+
+    if (error) {
+        console.error("Supabase Insert Error:", error.message);
+    }
 
 };
 
-const getMessages = () => messages;
+const getMessages = async () => {
+
+    const { data, error } = await supabase
+        .from("messages")
+        .select("*")
+        .order("timestamp", { ascending: true });
+
+    if (error) {
+
+        console.error("Supabase Fetch Error:", error.message);
+
+        return [];
+
+    }
+
+    return data;
+
+};
 
 module.exports = {
     saveMessage,
