@@ -9,29 +9,70 @@ const {
     getDashboardStats
 } = require("../services/statsService");
 
-const webhookHandler = (req, res) => {
+const webhookHandler = async (req, res) => {
 
-    saveMessage(req.body);
+    try {
 
-    console.log("📩 Webhook Received");
-    console.dir(req.body, { depth: null });
+        await saveMessage(req.body);
 
-    res.status(200).json({
-        success: true,
-        message: "Webhook received successfully"
-    });
+        console.log("📩 Webhook Received");
+        console.dir(req.body, { depth: null });
+
+        res.status(200).json({
+            success: true,
+            message: "Webhook received successfully"
+        });
+
+    } catch (error) {
+
+        console.error("Webhook Error:", error);
+
+        res.status(500).json({
+            success: false,
+            message: "Unable to save webhook."
+        });
+
+    }
 
 };
 
-const getAllMessages = (req, res) => {
+const getAllMessages = async (req, res) => {
 
-    res.status(200).json(getMessages());
+    try {
+
+        const messages = await getMessages();
+
+        res.status(200).json(messages);
+
+    } catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            message: "Unable to fetch messages."
+        });
+
+    }
 
 };
 
-const getDashboard = (req, res) => {
+const getDashboard = async (req, res) => {
 
-    res.status(200).json(getDashboardStats());
+    try {
+
+        const stats = await getDashboardStats();
+
+        res.status(200).json(stats);
+
+    } catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            message: "Unable to load dashboard."
+        });
+
+    }
 
 };
 
@@ -47,18 +88,19 @@ const sendWhatsappMessage = async (req, res) => {
 
     } catch (error) {
 
-    console.log("========== ZOKO ERROR ==========");
-    console.log(error.response?.status);
-    console.log(error.response?.data);
-    console.log(error.message);
-    console.log("===============================");
+        console.log("========== ZOKO ERROR ==========");
+        console.log(error.response?.status);
+        console.log(error.response?.data);
+        console.log(error.message);
+        console.log("===============================");
 
-    res.status(500).json({
-        message: "Failed to send WhatsApp message",
-        error: error.response?.data || error.message
-    });
+        res.status(error.response?.status || 500).json({
+            success: false,
+            message: "Failed to send WhatsApp message",
+            error: error.response?.data || error.message
+        });
 
-}
+    }
 
 };
 
