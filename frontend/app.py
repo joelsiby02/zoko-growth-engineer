@@ -6,7 +6,8 @@ from streamlit_autorefresh import st_autorefresh
 # ----------------------------------
 # Configuration
 # ----------------------------------
-BACKEND_URL = "http://localhost:5000"
+# BACKEND_URL = "http://localhost:5000"
+BACKEND_URL = "https://zoko-growth-engineer.onrender.com"
 
 st.set_page_config(
     page_title="Zoko Live Messaging Monitor",
