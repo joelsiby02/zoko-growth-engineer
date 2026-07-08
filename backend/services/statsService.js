@@ -414,28 +414,36 @@ const getDashboardStats = () => {
 
         if (message.direction === "FROM_STORE") {
 
-            const agentIdentifier =
-                message.agentEmail ||
-                message.senderName ||
-                message.appName ||
-                "Unknown";
+            // ------------------------------------
+            // Determine the actual agent identity
+            // ------------------------------------
+            let agentIdentifier;
+            let displayName;
+
+            if (message.agentEmail) {
+                // Human agent
+                agentIdentifier = message.agentEmail;
+                displayName = message.senderName || message.agentEmail;
+            } else if (message.appName) {
+                // AI Agent (Guru, WISMO, Hallo, etc.)
+                agentIdentifier = message.appName;
+                displayName = message.appName;
+            } else {
+                // Fallback
+                agentIdentifier = message.senderName || "Unknown";
+                displayName = message.senderName || "Unknown";
+            }
 
             uniqueAgents.add(agentIdentifier);
 
             if (!activeAgents.has(agentIdentifier)) {
-
                 activeAgents.set(agentIdentifier, {
-
-                    name: message.senderName || "-",
-
+                    identifier: agentIdentifier,
+                    name: displayName,
                     email: message.agentEmail || "-",
-
                     appName: message.appName || "-",
-
                     appType: message.appType || "-"
-
                 });
-
             }
 
             // Already counted today's first response
